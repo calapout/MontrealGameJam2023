@@ -39,10 +39,14 @@ void AMainCharacter::BeginPlay()
 void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	const FVector2d normalizedVector = this->direction.GetSafeNormal();
-	AddMovementInput(FVector3d(normalizedVector.X, normalizedVector.Y, 0), this->movementSpeed, false);
 	GetRootComponent()->SetRelativeRotation(FRotator(0, rotationX, 0));
 	camera->SetRelativeRotation(FRotator(rotationY, 0, 0));
+	
+	FVector orientation = camera->GetForwardVector();
+	const FVector2d normalizedVector = this->direction.GetSafeNormal();
+
+	// Get forward vector
+	AddMovementInput(FVector(orientation.X * normalizedVector.X * movementSpeed, orientation.Y * normalizedVector.Y * movementSpeed, 0), this->movementSpeed, false);
 }
 
 // Called to bind functionality to input
@@ -51,10 +55,9 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	
 	UEnhancedInputComponent* input  = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
+	input->BindAction(this->MoveAction, ETriggerEvent::Triggered, this, &AMainCharacter::Move); //When moving
 	input->BindAction(this->MouseXAxisAction, ETriggerEvent::Triggered, this, &AMainCharacter::RotateX); //When moving
 	input->BindAction(this->MouseYAxisAction, ETriggerEvent::Triggered, this, &AMainCharacter::RotateY); //When moving
-
-	input->BindAction(this->MoveAction, ETriggerEvent::Triggered, this, &AMainCharacter::Move); //When moving
 }
 
 /** Returns the owning ULocalPlayer of an Enhanced Player Input pointer */
