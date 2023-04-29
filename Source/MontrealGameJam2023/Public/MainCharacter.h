@@ -51,7 +51,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	float rotationYSpeed = 0;
 
-	// UPROPERTY(EditAnywhere, Category="Gameplay Values")
+	UPROPERTY(EditAnywhere, Category="Input")
 	float movementSpeed = 1.0;
 
 	// Called when the game starts or when spawned

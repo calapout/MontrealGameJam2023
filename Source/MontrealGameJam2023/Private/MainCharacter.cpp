@@ -41,7 +41,7 @@ void AMainCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	const FVector2d normalizedVector = this->direction.GetSafeNormal();
 	AddMovementInput(FVector3d(normalizedVector.X, normalizedVector.Y, 0), this->movementSpeed, false);
-	GetRootComponent()->SetRelativeRotation(FRotator3f(0, 0, rotationX));
+	GetRootComponent()->SetRelativeRotation(FRotator(0, rotationX, 0));
 	camera->GetComponentTransform().TransformRotation(UE::Math::TQuat<double>());
 }
 
@@ -52,8 +52,8 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	
 	UEnhancedInputComponent* input  = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 	input->BindAction(this->MoveAction, ETriggerEvent::Triggered, this, &AMainCharacter::Move); //When moving
-	input->BindAction(this->MoveAction, ETriggerEvent::Triggered, this, &AMainCharacter::Move); //When moving
-	input->BindAction(this->MoveAction, ETriggerEvent::Triggered, this, &AMainCharacter::Move); //When moving
+	input->BindAction(this->MouseXAxisAction, ETriggerEvent::Triggered, this, &AMainCharacter::RotateX); //When moving
+	input->BindAction(this->MouseYAxisAction, ETriggerEvent::Triggered, this, &AMainCharacter::RotateY); //When moving
 }
 
 /** Returns the owning ULocalPlayer of an Enhanced Player Input pointer */
@@ -79,6 +79,7 @@ void AMainCharacter::Move(const FInputActionValue& value)
 void AMainCharacter::RotateX(const FInputActionValue& value)
 {
 	this->rotationX += value.Get<float>() * rotationXSpeed;
+	UE_LOG(LogTemp, Warning, TEXT("RotationX: %f"), this->rotationX);
 	this->rotationX = fmod(this->rotationX, 360.0f);
 	if(this->rotationX < 0)
 	{
@@ -88,8 +89,9 @@ void AMainCharacter::RotateX(const FInputActionValue& value)
 
 void AMainCharacter::RotateY(const FInputActionValue& value)
 {
-	this->rotationY += value.Get<float>() * rotationYSpeed;
-	this->rotationY = fmod(this->rotationY, 360.0f);
+	this->rotationY = value.Get<float>() * rotationYSpeed;
+	UE_LOG(LogTemp, Warning, TEXT("RotationY: %f"), this->rotationY);
+	this->rotationY += fmod(this->rotationY, 360.0f);
 	if(this->rotationY < 0)
 	{
 		this->rotationY = 360.0f - this->rotationY;
